@@ -1,8 +1,7 @@
 use chrono::prelude::*;
 use dotenv::dotenv;
-use std::collections::HashMap;
+use serde_json::Value;
 use std::env;
-use std::str::FromStr;
 
 #[derive(Debug)]
 enum Currency {
@@ -76,18 +75,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         api_key,
     );
 
-    let resp = reqwest::get(
-        url, // "http://api.exchangeratesapi.io/v1/latest?access_key=".to_owned()
-            //     + &api_key
-            //     // + "&base=USD"
-            //     + "&symbols".to_owned() + &config.currency,
-    )
-    .await?
-    .text()
-    .await?;
-    // .json::<HashMap<String, String>>()
-    // .await?;
+    let resp = reqwest::get(url).await?.text().await?;
 
-    println!("{:#?}", resp);
+    let deserialized: Value = serde_json::from_str(&resp).unwrap();
+
+    println!("{:#?}", deserialized);
+
     Ok(())
 }
